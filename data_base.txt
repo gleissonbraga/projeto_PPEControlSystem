@@ -1,0 +1,158 @@
+states
+- cod-state
+- state_name
+- state_code
+
+
+CREATE TABLE states (
+    cod_state SERIAL PRIMARY KEY,   
+    state_name VARCHAR(50) NOT NULL,  
+    state_code CHAR(2) NOT NULL UNIQUE 
+)
+
+----------------------------------------------------------
+
+
+COMPANY
+- cod_company
+- social_name
+- fantasy_name
+- cnpj
+- enrollment_state
+- addres
+- number
+- CEP
+- cod_state
+- city
+- date_now
+
+
+CREATE TABLE company (
+    cod_company SERIAL PRIMARY KEY,           
+    social_name VARCHAR(70) NOT NULL,              
+    fantasy_name VARCHAR(70) NOT NULL,             
+    cnpj CHAR(14) NOT NULL UNIQUE,               
+    enrollment_state VARCHAR(50),              
+    address VARCHAR(50) NOT NULL,
+	number VARCHAR(10) NOT NULL, 
+    cep CHAR(8) NOT NULL,                         
+    cod_state INT NOT NULL,                    
+    city VARCHAR(100) NOT NULL,                  
+    date_now TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_state FOREIGN KEY (cod_state) REFERENCES states (cod_state) 
+);
+
+
+
+-----------------------------------------------------------
+
+USER
+- cod_user
+- name
+- last_name
+- cpf
+- password
+- date_of_bird
+- status_admin
+- cod_company
+- date_now
+
+
+
+CREATE TABLE "user" (
+    cod_user SERIAL PRIMARY KEY,               
+    user_name VARCHAR(20) NOT NULL,               
+    cpf CHAR(11) NOT NULL UNIQUE,            
+    password VARCHAR(60) NOT NULL,          
+    date_of_birth DATE NOT NULL,               
+    status_admin BOOLEAN NOT NULL DEFAULT FALSE, 
+    cod_company INT NOT NULL,               
+    date_now TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_state FOREIGN KEY (cod_company) REFERENCES company (cod_company) 
+);
+
+--------------------------------------------------------
+
+EMPLOYEE
+- cod_employee
+- employee_name
+- function
+- CPF
+- date_of_birth
+- date_start_date
+- date_layoff
+- status_employee
+- cod_company
+- date_now
+
+
+CREATE TABLE employee (
+    cod_employee SERIAL PRIMARY KEY,                
+    employee_name VARCHAR(70) NOT NULL,            
+    function VARCHAR(70) NOT NULL,                
+    CPF CHAR(11) NOT NULL UNIQUE,                   
+    date_of_birth DATE NOT NULL,                 
+    date_start_date DATE NOT NULL,              
+    date_layoff DATE,                               
+    status_employee VARCHAR(7) NOT NULL DEFAULT 'ativo',
+    cod_company INT NOT NULL,                 
+    date_now TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
+    CONSTRAINT fk_company FOREIGN KEY (cod_company) REFERENCES company (cod_company)
+);
+
+
+--------------------------------------------------------------------------------------
+
+CATEGORY_EPI
+- cod_category_epi
+- model
+- date_now
+
+
+CREATE TABLE CATEGORY_EPI (
+    cod_category_epi SERIAL PRIMARY KEY,      
+    model VARCHAR(100) NOT NULL,           
+    date_now TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
+);
+
+
+---------------------------------------------------------------------------------------
+
+PRODUCT_EPI
+- cod_epi
+- cod_category_epi
+- name_epi
+- color
+- size
+- date_now
+
+CREATE TABLE PRODUCT_EPI (
+    cod_epi SERIAL PRIMARY KEY,             
+    cod_category_epi INT NOT NULL,          
+    name_epi VARCHAR(100) NOT NULL,         
+    color VARCHAR(50),                      
+    size VARCHAR(50),                     
+    date_now TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    CONSTRAINT fk_category_epi FOREIGN KEY (cod_category_epi) REFERENCES CATEGORY_EPI (cod_category_epi) 
+);
+
+
+--------------------------------------------------------------------------------------------------------
+
+CONTROL_EPI
+- cod_control
+- cod_employee
+- cod_epi
+- quantity
+- date_delivery (date_now)
+
+
+CREATE TABLE CONTROL_EPI (
+    cod_control SERIAL PRIMARY KEY,         
+    cod_employee INT NOT NULL,               
+    cod_epi INT NOT NULL,                   
+    quantity VARCHAR(5) NOT NULL,                   
+    date_delivery TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
+    CONSTRAINT fk_employee FOREIGN KEY (cod_employee) REFERENCES employee (cod_employee),  
+    CONSTRAINT fk_epi FOREIGN KEY (cod_epi) REFERENCES product_epi (cod_epi) 
+)
