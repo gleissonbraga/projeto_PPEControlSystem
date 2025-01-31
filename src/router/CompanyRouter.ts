@@ -7,6 +7,7 @@ const companyController = new CompanyController()
 
 
 company_router.get("/", companyController.showCompanies)
+company_router.post("/cadastrar", companyController.createCompany)
 
 
 

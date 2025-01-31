@@ -61,7 +61,7 @@ export class CompanyRepository {
     static async showCompanies(){
 
 
-        const sql = 'select c.social_name, c.fantasy_name, c.cnpj, c.enrollment_state, c.address, c.number, c.cep, s.state_name, s.state_code, c.city from company as c join states s on (s.cod_state = c.cod_state)'
+        const sql = 'SELECT c.social_name, c.fantasy_name, c.cnpj, c.enrollment_state, c.address, c.number, c.cep, s.state_name, s.state_code, c.city FROM company as c join states s on (s.cod_state = c.cod_state)'
         const companies = await db_query(sql)
 
 
@@ -82,14 +82,34 @@ export class CompanyRepository {
         const cityLowerCase = city.toLowerCase()
 
 
-        const sql = 'INSERT INTO company (social_name, fantasy_name, cnpj, enrollment_state, address, number, cep, cod_state, city) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *'
+        const sqlVerficationCnpj = 'SELECT cnpj FROM company where cnpj = $1'
+        const valueCnpj = [cnpjLowerCase]
 
-        const values = [socialNameLowerCase, fantasyNameLowerCase, cnpjLowerCase, enrollment_stateLowerCase, addressLowerCase, numberLowerCase, cepLowerCase, cod_state, cityLowerCase]
-
-        const result = await db_query_params(sql, values)
-
-        const companyCreated = result.rows[0]
-
-        return companyCreated
+        const resultCnpj = await db_query_params(sqlVerficationCnpj, valueCnpj)
+        
+        if(resultCnpj.rows.length > 0){
+            return null
+        } else {
+            const sql = 'INSERT INTO company (social_name, fantasy_name, cnpj, enrollment_state, address, number, cep, cod_state, city) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING cod_company'
+            const values = [socialNameLowerCase, fantasyNameLowerCase, cnpjLowerCase, enrollment_stateLowerCase, addressLowerCase, numberLowerCase, cepLowerCase, cod_state, cityLowerCase]
+    
+    
+            const insertResult = await db_query_params(sql, values)
+    
+    
+            const companyCreated = insertResult.rows[0].cod_company
+    
+    
+            const sqlCompany = 'SELECT c.social_name, c.fantasy_name, c.cnpj, c.enrollment_state, c.address, c.number, c.cep, s.state_name, s.state_code, c.city FROM company as c join states s on s.cod_state = c.cod_state WHERE c.cod_company = $1'
+    
+    
+            const selectResult = await db_query_params(sqlCompany, [companyCreated])
+    
+    
+            return selectResult.rows[0]
+        }
     }
+
+
+        
 }

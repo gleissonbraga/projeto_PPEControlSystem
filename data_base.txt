@@ -156,3 +156,43 @@ CREATE TABLE CONTROL_EPI (
     CONSTRAINT fk_employee FOREIGN KEY (cod_employee) REFERENCES employee (cod_employee),  
     CONSTRAINT fk_epi FOREIGN KEY (cod_epi) REFERENCES product_epi (cod_epi) 
 )
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////
+
+INSERIR DADOS NA EMPRESA NOVAMENTE
+
+
+
+{
+	"socialName": "gmc technology",
+	"fantasyName": "gmc technology",
+	"cnpj": "99999999999999",
+	"enrollment_state": "123456789",
+	"address": "ana neri",
+	"number": "516",
+	"cep": "94450560",
+	"cod_state": 21,
+	"city": "viamão"
+}
+
+
+{
+	"socialName": "com de alimentos schoch e simao ltda",
+	"fantasyName": "supermercado tradição",
+	"cnpj": "11687437000161",
+	"enrollment_state": "123456789",
+	"address": "av dos soares",
+	"number": "675",
+	"cep": "94450550",
+	"cod_state": 21,
+	"city": "viamão"
+}
+
+TRUNCATE TABLE company RESTART IDENTITY CASCADE;
