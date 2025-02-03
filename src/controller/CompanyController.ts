@@ -16,6 +16,17 @@ const CompanyRequestSchema = z.object({
     city: z.string()
 })
 
+const CompanyRequestSchemaUpdate = z.object({
+    socialName: z.string(), 
+    fantasyName: z.string(),  
+    enrollment_state: z.string(), 
+    address: z.string(), 
+    number: z.string(), 
+    cep: z.string(), 
+    cod_state: z.number(), 
+    city: z.string()
+})
+
 
 export class CompanyController{
     // GET empresa/
@@ -33,6 +44,20 @@ export class CompanyController{
         } catch (error) {
             if(error instanceof HttpError) {
                 res.status(error.status).json({ message: error.message})
+            }
+        }
+    }
+
+    // PUT empresa/atualizar
+    updateCompany: Handler = async (req, res) => {
+        const {id} = req.params
+        try {
+            const parsedBody = CompanyRequestSchemaUpdate.parse(req.body)
+            const updteCompany = CompanyService.updateCompany(+id, parsedBody)
+            res.json(updteCompany)
+        } catch (error) {
+            if(error instanceof HttpError) {
+                res.status(error.status).json({ message: error.message })
             }
         }
     }

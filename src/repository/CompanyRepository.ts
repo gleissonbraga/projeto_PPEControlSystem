@@ -74,16 +74,14 @@ export class CompanyRepository {
 
         const socialNameLowerCase = socialName.toLowerCase()
         const fantasyNameLowerCase = fantasyName.toLowerCase()
-        const cnpjLowerCase = cnpj.toLowerCase()
         const enrollment_stateLowerCase = enrollment_state.toLowerCase()
         const addressLowerCase = address.toLowerCase()
         const numberLowerCase = number.toLowerCase()
-        const cepLowerCase = cep.toLowerCase()
         const cityLowerCase = city.toLowerCase()
 
 
         const sqlVerficationCnpj = 'SELECT cnpj FROM company where cnpj = $1'
-        const valueCnpj = [cnpjLowerCase]
+        const valueCnpj = [cnpj]
 
         const resultCnpj = await db_query_params(sqlVerficationCnpj, valueCnpj)
         
@@ -91,7 +89,7 @@ export class CompanyRepository {
             return null
         } else {
             const sql = 'INSERT INTO company (social_name, fantasy_name, cnpj, enrollment_state, address, number, cep, cod_state, city) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING cod_company'
-            const values = [socialNameLowerCase, fantasyNameLowerCase, cnpjLowerCase, enrollment_stateLowerCase, addressLowerCase, numberLowerCase, cepLowerCase, cod_state, cityLowerCase]
+            const values = [socialNameLowerCase, fantasyNameLowerCase, cnpj, enrollment_stateLowerCase, addressLowerCase, numberLowerCase, cep, cod_state, cityLowerCase]
     
     
             const insertResult = await db_query_params(sql, values)
@@ -108,6 +106,40 @@ export class CompanyRepository {
     
             return selectResult.rows[0]
         }
+    }
+
+    static async updateCompany(id: number, attributes: Omit<CompanyAttributes, "cnpj">){
+        const {socialName, fantasyName, enrollment_state, address, number, cep, cod_state, city} = attributes
+
+        const socialNameLowerCase = socialName.toLowerCase()
+        const fantasyNameLowerCase = fantasyName.toLowerCase()
+        const enrollment_stateLowerCase = enrollment_state.toLowerCase()
+        const addressLowerCase = address.toLowerCase()
+        const numberLowerCase = number.toLowerCase()
+        const cityLowerCase = city.toLowerCase()
+
+        
+        // const sqlVerficationCnpj = 'SELECT cnpj FROM company where cnpj = $1'
+        // const valueCnpj = [cnpj]
+
+        // const resultCnpj = await db_query_params(sqlVerficationCnpj, valueCnpj)
+
+        
+
+        // if(resultCnpj.rows.length > 0) {
+            // return null
+        // } else {
+            const sqlUpdate = "UPDATE company SET social_name = $1, fantasy_name = $2, enrollment_state = $3, address = $4, number = $5, cep = $6, cod_state = $7, city = $8 WHERE cod_company = $9"
+
+            const values = [socialNameLowerCase, fantasyNameLowerCase, enrollment_stateLowerCase, addressLowerCase, numberLowerCase, cep, cod_state, cityLowerCase, id]
+
+            const resultCompany = await db_query_params(sqlUpdate, values)
+
+            const company = resultCompany.rows[0]
+
+            return company
+        // }
+
     }
 
 
