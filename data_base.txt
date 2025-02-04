@@ -48,8 +48,8 @@ CREATE TABLE company (
 
 USER
 - cod_user
-- name
-- last_name
+- username
+- lastname
 - cpf
 - password
 - date_of_bird

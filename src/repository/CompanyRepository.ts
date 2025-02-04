@@ -33,8 +33,6 @@ interface CompanyAttributes {
     city: string
 }
 
-
-
 export class CompanyRepository {
     socialName: string
     fantasyName: string
@@ -108,8 +106,8 @@ export class CompanyRepository {
         }
     }
 
-    static async updateCompany(id: number, attributes: Omit<CompanyAttributes, "cnpj">){
-        const {socialName, fantasyName, enrollment_state, address, number, cep, cod_state, city} = attributes
+    static async updateCompany(id: number, attributes: CompanyAttributes){
+        const {socialName, fantasyName, cnpj, enrollment_state, address, number, cep, cod_state, city} = attributes
 
         const socialNameLowerCase = socialName.toLowerCase()
         const fantasyNameLowerCase = fantasyName.toLowerCase()
@@ -118,19 +116,25 @@ export class CompanyRepository {
         const numberLowerCase = number.toLowerCase()
         const cityLowerCase = city.toLowerCase()
 
-        
-        // const sqlVerficationCnpj = 'SELECT cnpj FROM company where cnpj = $1'
-        // const valueCnpj = [cnpj]
+        // CHECK CNPJ EXIST IN DATABASE
+        const sqlVerficationCnpj = 'SELECT cod_company FROM company WHERE cnpj = $1 AND cod_company != $2'
+        const valueCnpj = [cnpj, id]
 
-        // const resultCnpj = await db_query_params(sqlVerficationCnpj, valueCnpj)
+        const resultCnpj = await db_query_params(sqlVerficationCnpj, valueCnpj)
 
-        
+        if(resultCnpj.rows.length > 0){
+            return null
+        } else {
 
-        // if(resultCnpj.rows.length > 0) {
-            // return null
-        // } else {
-            const sqlUpdate = "UPDATE company SET social_name = $1, fantasy_name = $2, enrollment_state = $3, address = $4, number = $5, cep = $6, cod_state = $7, city = $8 WHERE cod_company = $9"
+            // UPDATE CNPJ
+            const sqlCnpj = "UPDATE company SET cnpj = $1 WHERE cod_company = $2 RETURNING cnpj"
+            const valueUpdateCnpj = [cnpj, id]
 
+            const resultUpdateCnpj = await db_query_params(sqlCnpj, valueUpdateCnpj)
+            const cnpjUpdated = resultUpdateCnpj.rows[0]
+
+            // UPDATE OTHERS DADOS
+            const sqlUpdate = "UPDATE company SET social_name = $1, fantasy_name = $2, enrollment_state = $3, address = $4, number = $5, cep = $6, cod_state = $7, city = $8 WHERE cod_company = $9 RETURNING *"
             const values = [socialNameLowerCase, fantasyNameLowerCase, enrollment_stateLowerCase, addressLowerCase, numberLowerCase, cep, cod_state, cityLowerCase, id]
 
             const resultCompany = await db_query_params(sqlUpdate, values)
@@ -138,10 +142,8 @@ export class CompanyRepository {
             const company = resultCompany.rows[0]
 
             return company
-        // }
+        }
 
     }
-
-
         
 }

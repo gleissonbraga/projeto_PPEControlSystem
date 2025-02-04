@@ -51,7 +51,8 @@ export class CompanyService {
 
     static async updateCompany(id: number, attributes: {
         socialName: string, 
-        fantasyName: string, 
+        fantasyName: string,
+        cnpj: string, 
         enrollment_state: string, 
         address: string, 
         number: string, 
@@ -60,16 +61,15 @@ export class CompanyService {
         city: string}) {
         
 
-            const {socialName, fantasyName, enrollment_state, address, number, cep, cod_state, city} = attributes
+            const {socialName, fantasyName, cnpj,  enrollment_state, address, number, cep, cod_state, city} = attributes
 
-            if(!socialName || !fantasyName || !enrollment_state || !address || !number || !cep || !cod_state || !city){
+            if(!socialName || !fantasyName || !cnpj || !enrollment_state || !address || !number || !cep || !cod_state || !city){
                 throw new HttpError(400, "Todos os dados devem ser inseridos")
             } else {
-                
-                
+
                 // CHECK IF THE CNPJ IS A NUMBER AND HAS 14 INNER NUMBERS
-                // const verificaionCnpj = /^\d{14}$/
-                // if(!verificaionCnpj.test(cnpj)) throw new HttpError(400, "CNPJ inválido")
+                const verificaionCnpj = /^\d{14}$/
+                if(!verificaionCnpj.test(cnpj)) throw new HttpError(400, "CNPJ inválido")
                 
                 // CHECK IF THE CEP IS A NUMBER AND HAS 8 INNER NUMBERS
                 const verificaionCep = /^\d{8}$/
@@ -79,9 +79,11 @@ export class CompanyService {
                 const verificaionenrollment_state = /^\d{9}$/
                 if(!verificaionenrollment_state.test(enrollment_state)) throw new HttpError(400, "Inscrição estadual inválida")
 
-                const updateCompany = await CompanyRepository.updateCompany(id, {socialName, fantasyName, enrollment_state, address, number, cep, cod_state, city})
+                const updateCompany = await CompanyRepository.updateCompany(id, {socialName, fantasyName, cnpj, enrollment_state, address, number, cep, cod_state, city})
 
-                if(updateCompany === null) throw new HttpError(400, "Este CNPJ já existe")
+                if(updateCompany === null) {
+                    throw new HttpError(400, "Este CNPJ já existe em outra empresa")
+                }
 
                 return updateCompany
 
