@@ -11,8 +11,8 @@ const UerRequestSchema = z.object({
     email: z.string(), 
     phonenumber: z.string(), 
     date_of_birth: z.string(), 
-    status_admin: z.boolean(), 
-    cod_company: z.number(), 
+    status_admin: z.number(), 
+    cod_company: z.number().nullable(), 
 })
 
 
@@ -29,6 +29,20 @@ export class UserController {
             const parsedBody = UerRequestSchema.parse(req.body)
             const userCreated = await UserService.createUser(parsedBody)
             res.json(userCreated)
+            
+        } catch (error) {
+            if(error instanceof HttpError){
+                res.status(error.status).json({ message: error.message })
+            }
+        }
+    }
+
+    updateUser: Handler = async (req, res) => {
+        const { id } = req.params
+        try {
+            const parsedBody = UerRequestSchema.parse(req.body)
+            const userUpdate = await UserService.updateUser(+id, parsedBody)
+            res.json(userUpdate)
             
         } catch (error) {
             if(error instanceof HttpError){

@@ -49,27 +49,30 @@ CREATE TABLE company (
 USER
 - cod_user
 - username
-- lastname
 - cpf
 - password
+- email
+- phonenumber
 - date_of_bird
-- status_admin
+- status_admin (1: usuario comum, 2: admin, 3: superadmin)
 - cod_company
 - date_now
 
 
 
-CREATE TABLE "user" (
+CREATE TABLE users (
     cod_user SERIAL PRIMARY KEY,               
-    user_name VARCHAR(20) NOT NULL,               
-    cpf CHAR(11) NOT NULL UNIQUE,            
-    password VARCHAR(60) NOT NULL,          
-    date_of_birth DATE NOT NULL,               
-    status_admin BOOLEAN NOT NULL DEFAULT FALSE, 
-    cod_company INT NOT NULL,               
+    username VARCHAR(20) NOT NULL,               
+    cpf CHAR(11) NOT NULL UNIQUE, 
+    password VARCHAR(60) NOT NULL, 
+	email VARCHAR(50) NOT NULL,
+	phonenumber VARCHAR(12) NOT NULL,
+    date_of_birth CHAR(10) NOT NULL,               
+    status_admin INT NOT NULL CHECK (status_admin IN (1, 2, 3)), 
+    cod_company INT,               
     date_now TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_state FOREIGN KEY (cod_company) REFERENCES company (cod_company) 
-);
+)
 
 --------------------------------------------------------
 

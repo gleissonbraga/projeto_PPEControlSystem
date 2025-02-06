@@ -8,7 +8,7 @@ const userController = new UserController()
 
 user_router.get("/", userController.showUsers)
 user_router.post("/cadastrar", userController.createUser)
-// user_router.put("/atualizar/:id", userController.updateuser)
+user_router.put("/atualizar/:id", userController.updateUser)
 
 
 
