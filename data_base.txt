@@ -93,15 +93,16 @@ CREATE TABLE employee (
     cod_employee SERIAL PRIMARY KEY,                
     employee_name VARCHAR(70) NOT NULL,            
     function VARCHAR(70) NOT NULL,                
-    CPF CHAR(11) NOT NULL UNIQUE,                   
-    date_of_birth DATE NOT NULL,                 
-    date_start_date DATE NOT NULL,              
-    date_layoff DATE,                               
-    status_employee VARCHAR(7) NOT NULL DEFAULT 'ativo',
+    cpf CHAR(11) NOT NULL UNIQUE,                   
+    date_of_birth VARCHAR(10) NOT NULL,                 
+    date_start_date VARCHAR(10) NOT NULL,              
+    date_layoff VARCHAR(10),                               
+    status_employee BOOLEAN NULL DEFAULT true,
     cod_company INT NOT NULL,                 
     date_now TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
     CONSTRAINT fk_company FOREIGN KEY (cod_company) REFERENCES company (cod_company)
 );
+
 
 
 --------------------------------------------------------------------------------------
@@ -155,7 +156,7 @@ CREATE TABLE CONTROL_EPI (
     cod_employee INT NOT NULL,               
     cod_epi INT NOT NULL,                   
     quantity VARCHAR(5) NOT NULL,                   
-    date_delivery TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
+    date_delivery VARCHAR(30) NOT NULL,  
     CONSTRAINT fk_employee FOREIGN KEY (cod_employee) REFERENCES employee (cod_employee),  
     CONSTRAINT fk_epi FOREIGN KEY (cod_epi) REFERENCES product_epi (cod_epi) 
 )
