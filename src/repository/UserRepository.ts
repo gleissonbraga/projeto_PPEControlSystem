@@ -43,10 +43,33 @@ export class UserRepository {
         this.cod_company = attributes.cod_company
     }
 
+    static async showInactiveUsers(){
+
+        const sql = "SELECT * FROM users WHERE ativo = $1"
+        const inativate = false
+    
+
+        const result = await db_query_params(sql, [inativate])
+
+        return result.rows
+    }
+
+
+    static async showInactiveUsersByCompany(cod_company: number){
+
+        const sql = "SELECT * FROM users WHERE ativo = $1 AND cod_company = $2"
+        const inativate = false
+        
+        const value = [inativate, cod_company]
+
+        const result = await db_query_params(sql, value)
+
+        return result.rows
+    }
 
 
     static async showUsers(){
-        const sql = "SELECT u.cod_user, u.username, u.cpf, u.password, u.email, u.phonenumber, u.date_of_birth, c.fantasy_name, c.cnpj, u.status_admin FROM users as u LEFT JOIN company c on (c.cod_company = u.cod_company) ORDER BY cod_user"
+        const sql = "SELECT u.cod_user, u.username, u.cpf, u.password, u.email, u.phonenumber, u.date_of_birth, c.fantasy_name, c.cnpj, u.status_admin, u.ativo FROM users as u LEFT JOIN company c on (c.cod_company = u.cod_company) WHERE u.ativo = true ORDER BY cod_user"
 
         const resultUsers = await db_query(sql)
         const users = resultUsers.rows
@@ -54,21 +77,24 @@ export class UserRepository {
         return users
     }
 
-    static async showUsersAdminsCompanies(){
-        const sql = "SELECT u.cod_user, u.username, u.cpf, u.password, u.email, u.phonenumber, u.date_of_birth, c.fantasy_name, c.cnpj, u.status_admin FROM users as u JOIN company c on (c.cod_company = u.cod_company) ORDER BY cod_user"
+    static async showUsersAdminsCompanies(company: number){
+        const sql = "SELECT u.cod_user, u.username, u.cpf, u.password, u.email, u.phonenumber, u.date_of_birth, c.fantasy_name, c.cnpj, u.status_admin, u.ativo FROM users as u JOIN company c on (c.cod_company = u.cod_company AND u.status_admin = $1) WHERE u.cod_company = $2 AND u.ativo = true ORDER BY cod_user"
 
-        const resultUsers = await db_query(sql)
+        const status = 2
+        const valueCompany = [status, company]
+
+        const resultUsers = await db_query_params(sql, valueCompany)
         const users = resultUsers.rows
 
         return users
     }
 
     static async showUsersSuperAdmins(){
-        const sql = "SELECT * FROM user WHERE status_admin = $1 AND cod_company = $2"
+        const sql = "SELECT * FROM users WHERE status_admin = $1 AND ativo = true ORDER BY username"
 
         const valueOne = 3
-        const valueTwo = null
-        const values = [valueOne, valueTwo]
+        // const valueTwo = null
+        const values = [valueOne]
 
         const resultUsers = await db_query_params(sql, values)
 
@@ -165,4 +191,28 @@ export class UserRepository {
 
         }
     }
+
+    static async deleteUser(id: number){
+
+        const sql = "UPDATE users SET ativo = $1 WHERE cod_user = $2 RETURNING *"
+        const inactivate = false
+        const values = [inactivate, id]
+
+        const result = await db_query_params(sql, values)
+
+
+        return result.rows[0]
+    }
+
+    static async activeUser(id: number){
+
+        const sql = "UPDATE users SET ativo = $1 WHERE cod_user = $2 RETURNING *"
+        const activate = true
+        const values = [activate, id]
+
+        const result = await db_query_params(sql, values)
+
+        return result.rows[0]
+    }
+    
 }

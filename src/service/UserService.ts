@@ -3,8 +3,40 @@ import { UserRepository } from "../repository/UserRepository"
 
 
 export class UserService {
+
+    static async showInactiveUsers(){
+        const inativateUsers = await UserRepository.showInactiveUsers()
+        return inativateUsers
+    }
+
+    static async showInactiveUsersByCompany(cod_company: number){
+        const inativateUsers = await UserRepository.showInactiveUsersByCompany(cod_company)
+
+        if(inativateUsers == undefined){
+            throw new HttpError(400, "Não existe esta empresa")
+        } else {
+            return inativateUsers
+        }
+        
+    }
+
     static async showUsers(){
         const users = await UserRepository.showUsers()
+        return users
+    }
+
+    static async showUsersAdminsCompanies(company: number){
+        const users = await UserRepository.showUsersAdminsCompanies(company)
+
+        if(users == undefined){
+            throw new HttpError(400, "Não existe esta empresa")
+        } else {
+            return users
+        }
+    }
+
+    static async showUsersSuperAdmins(){
+        const users = await UserRepository.showUsersSuperAdmins()
         return users
     }
 
@@ -94,6 +126,28 @@ export class UserService {
             if(updateUser === false) throw new HttpError(400, "Este email já existe.")
 
             return updateUser
+        }
+    }
+
+
+    static async deleteUser(id: number){
+
+        const userDeleted = await UserRepository.deleteUser(id)
+
+        if(userDeleted == undefined){
+            throw new HttpError(400, "Não existe este usuário")
+        } else {
+            return userDeleted
+        }
+    }
+
+    static async activeUser(id: number){
+        const userActivated = await UserRepository.activeUser(id)
+
+        if(userActivated == undefined){
+            throw new HttpError(400, "Não existe este usuário")
+        } else {
+            return userActivated
         }
     }
 }
