@@ -59,7 +59,7 @@ export class CompanyRepository {
     static async showCompanies(){
 
 
-        const sql = 'SELECT c.social_name, c.fantasy_name, c.cnpj, c.enrollment_state, c.address, c.number, c.cep, s.state_name, s.state_code, c.city FROM company as c join states s on (s.cod_state = c.cod_state)'
+        const sql = 'SELECT c.cod_company, c.social_name, c.fantasy_name, c.cnpj, c.enrollment_state, c.address, c.number, c.cep, s.state_name, s.state_code, c.city FROM company as c join states s on (s.cod_state = c.cod_state)'
         const companies = await db_query(sql)
 
 

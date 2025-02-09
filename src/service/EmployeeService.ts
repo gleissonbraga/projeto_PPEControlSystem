@@ -24,10 +24,10 @@ export class EmployeeService {
         return employees
     }
 
-    static async createEmployee(attributes: {name: string, job_position: string, cpf: string, date_of_birth: string, start_date: string, date_layoff: string | null, cod_company: number | null}){
-        const { name, job_position, cpf, date_of_birth, start_date, date_layoff, cod_company } = attributes
+    static async createEmployee(attributes: {name: string, job_position: string, cpf: string, date_of_birth: string, start_date: string, cod_company: number | null}){
+        const { name, job_position, cpf, date_of_birth, start_date, cod_company } = attributes
 
-        if(!name || !job_position || !cpf || !date_of_birth || !start_date || !date_layoff || !cod_company){
+        if(!name || !job_position || !cpf || !date_of_birth || !start_date || !cod_company){
             throw new HttpError(400, "Todos os dados são obrigatórios")
         } else {
 
@@ -48,7 +48,12 @@ export class EmployeeService {
             if(!checkCpfIsNumber.test(cpf)) throw new HttpError(400, "O CPF deve conter somente números. ex: (00000000000)")
 
 
-            // const employeeCreated = await EmployeeRepository.createEmployee({name, job_position, cpf, date_of_birth, start_date, date_layoff, cod_company})
+            const employeeCreated = await EmployeeRepository.createEmployee({name, job_position, cpf, date_of_birth, start_date, cod_company})
+
+            if(employeeCreated === null) throw new HttpError(400, "Este CPF já existe")
+
+            return employeeCreated
+
         }
     }
 }

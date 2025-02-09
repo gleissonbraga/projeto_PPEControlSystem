@@ -29,7 +29,7 @@ interface EmployeeAttribute {
     cpf: string
     date_of_birth: string
     start_date: string
-    date_layoff: string
+    date_layoff: string | null
     status_employee: boolean
     cod_company: number
 }
@@ -41,7 +41,7 @@ export class EmployeeRepository{
     cpf: string
     date_of_birth: string
     start_date: string
-    date_layoff: string
+    date_layoff: string | null
     status_employee: boolean
     cod_company: number
 
@@ -66,7 +66,7 @@ export class EmployeeRepository{
     }
     
     static async showEmployeeByCompany(cod_company: number){
-        const sql = "SELECT e.cod_employee, e.name, e.job_position, e.cpf, e.date_of_birth, e.start_date, e.date_layoff, e.status_employee, c.fantasy_name, c.cnpj FROM employee as e JOIN company c ON (c.cod_company = e.cod_company) WHERE e.status_employee = $1 AND e.cod_ompany = $2 ORDER BY name"
+        const sql = "SELECT e.cod_employee, e.name, e.job_position, e.cpf, e.date_of_birth, e.start_date, e.date_layoff, e.status_employee, c.fantasy_name, c.cnpj FROM employee as e JOIN company c ON (c.cod_company = e.cod_company) WHERE e.status_employee = $1 AND e.cod_company = $2 ORDER BY name"
 
         const trueEmployee = true
         const values = [trueEmployee, cod_company]
@@ -89,7 +89,7 @@ export class EmployeeRepository{
 
 
     static async showInativateEmployeeByCompany(cod_company: number){
-        const sql = "SELECT e.cod_employee, e.name, e.job_position, e.cpf, e.date_of_birth, e.start_date, e.date_layoff, e.status_employee, c.fantasy_name, c.cnpj FROM employee as e JOIN company c ON (c.cod_company = e.cod_company) WHERE e.status_employee = $1 AND e.cod_ompany = $2 ORDER BY name"
+        const sql = "SELECT e.cod_employee, e.name, e.job_position, e.cpf, e.date_of_birth, e.start_date, e.date_layoff, e.status_employee, c.fantasy_name, c.cnpj FROM employee as e JOIN company c ON (c.cod_company = e.cod_company) WHERE e.status_employee = $1 AND e.cod_company = $2 ORDER BY name"
 
         const falseEmployee = false
         const values = [falseEmployee, cod_company]
@@ -153,12 +153,13 @@ export class EmployeeRepository{
     }
 
 
-    static async createEmployee(attributes: EmployeeAttribute){
-        const { name, job_position, cpf, date_of_birth, start_date, date_layoff, cod_company } = attributes
+    static async createEmployee(attributes: Omit<EmployeeAttribute, "status_employee"| "date_layoff">){
+        const { name, job_position, cpf, date_of_birth, start_date, cod_company } = attributes
         
         const nameLowerCase = name.toLocaleLowerCase()
         const job_positionLowerCase = job_position.toLocaleLowerCase()
         const default_status_employee = true
+        const date_layoff = null
 
         const sqlCheckCpf = "SELECT cpf FROM employee WHERE cpf = $1"
         const valueCheckCpf = [cpf]
