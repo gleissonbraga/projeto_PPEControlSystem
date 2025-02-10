@@ -13,7 +13,7 @@ user_router.get("/admin/empresas", userController.showUsersAdminsCompanies)
 user_router.get("/superadmins", userController.showUsersSuperAdmins)
 user_router.post("/cadastrar", userController.createUser)
 user_router.put("/atualizar/:id", userController.updateUser)
-user_router.delete("/delete/:id", userController.deleteUser)
+user_router.patch("/delete/:id", userController.deleteUser)
 user_router.put("/ativa/:id", userController.activeUser)
 
 

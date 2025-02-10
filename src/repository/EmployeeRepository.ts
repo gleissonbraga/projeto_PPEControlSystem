@@ -177,5 +177,60 @@ export class EmployeeRepository{
         }
 
     }
+
+
+    static async updateEmployee(id: number, attributes: EmployeeAttribute){
+        const { name, job_position, cpf, date_of_birth, start_date, date_layoff, status_employee, cod_company } = attributes
+
+        const nameLowerCase = name.toLocaleLowerCase()
+        const job_positionLowerCase = job_position.toLocaleLowerCase()
+
+        const sqlCheckCpf = "SELECT cpf FROM employee WHERE cpf = $1 and cod_employee != $2"
+        const valueCheckCpf = [cpf, id]
+        const resultCheckCpf = await db_query_params(sqlCheckCpf, valueCheckCpf)
+        console.log(resultCheckCpf.rows)
+
+        if(resultCheckCpf.rows.length > 0) {
+            return null
+        } else {
+
+            const sqlUpdateCpf = "UPDATE employee SET cpf = $1 WHERE cod_employee = $2 RETURNING *"
+            const valueCpf = [cpf, id]
+            const cpfUpdated = await db_query_params(sqlUpdateCpf, valueCpf)
+
+            const sqlUpdateEmployee = "UPDATE employee SET name = $1, job_position = $2, date_of_birth = $3, start_date = $4, date_layoff = $5, status_employee = $6, cod_company = $7 WHERE cod_employee = $8 RETURNING *"
+            const valuesUpdateEmployee = [nameLowerCase, job_positionLowerCase, date_of_birth, start_date, date_layoff, status_employee, cod_company, id]
+            const employeeUpdated = await db_query_params(sqlUpdateEmployee, valuesUpdateEmployee)
+
+            const resultEmployee = employeeUpdated.rows[0]
+
+            return resultEmployee
+            
+        }
+
+    }
+
+    static async inactivateEmployee(id: number) {
+        const status_employee = false
+
+        const sqlInactivate = "UPDATE employee SET status_employee = $1 WHERE cod_employee = $2 RETURNING *"
+        const valueInactivate = [status_employee, id]
+        const result = await db_query_params(sqlInactivate, valueInactivate)
+
+        return result.rows[0]
+    }
+
+
+    static async activateEmployee(id: number) {
+        const status_employee = true
+
+        const sqlActivate = "UPDATE employee SET status_employee = $1 WHERE cod_employee = $2 RETURNING *"
+        const valueActivate = [status_employee, id]
+        const result = await db_query_params(sqlActivate, valueActivate)
+        
+        return result.rows[0]
+
+    }
+
  
 }
