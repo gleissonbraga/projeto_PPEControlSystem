@@ -5,6 +5,7 @@ import { company_router } from "./router/CompanyRouter";
 import { user_router } from "./router/UserRouter";
 import { employee_router } from "./router/EmployeeRouter";
 import { category_epi_router } from "./router/CategoryEpiRouter";
+import { product_epi_router } from "./router/productEpiRouter";
 
 
 dotenv.config()
@@ -18,6 +19,7 @@ app.use('/empresa', company_router)
 app.use('/usuario', user_router)
 app.use('/funcionarios', employee_router)
 app.use('/categoria_epi', category_epi_router)
+app.use('/epis', product_epi_router)
 
 
 
