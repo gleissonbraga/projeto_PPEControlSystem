@@ -5,7 +5,7 @@ import { company_router } from "./router/CompanyRouter";
 import { user_router } from "./router/UserRouter";
 import { employee_router } from "./router/EmployeeRouter";
 import { category_epi_router } from "./router/CategoryEpiRouter";
-import { product_epi_router } from "./router/productEpiRouter";
+import { product_epi_router } from "./router/ProductEpiRouter";
 
 
 dotenv.config()
