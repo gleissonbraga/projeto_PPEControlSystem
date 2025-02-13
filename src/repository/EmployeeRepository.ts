@@ -231,6 +231,5 @@ export class EmployeeRepository{
         return result.rows[0]
 
     }
-
  
 }
