@@ -1,4 +1,5 @@
 import { Database } from "../config/db"
+import { PdfEmployee } from "../pdf/pdfEmployee"
 
 const openDbConnection = Database.openDbConnection
 const endDbConnection = Database.endDbConnection
@@ -21,7 +22,7 @@ const db_query_params = Database.db_query_params
 /////////////////////////////////////////////
 // EXTRA: search by cpf, name and job position
 
-
+const newDocPdfEmploye = new PdfEmployee()
 
 interface EmployeeAttribute {
     name: string
@@ -159,7 +160,7 @@ export class EmployeeRepository{
         const nameLowerCase = name.toLocaleLowerCase()
         const job_positionLowerCase = job_position.toLocaleLowerCase()
         const default_status_employee = true
-        const date_layoff = null
+        const date_layoff_parametro = null
 
         const sqlCheckCpf = "SELECT cpf FROM employee WHERE cpf = $1"
         const valueCheckCpf = [cpf]
@@ -168,8 +169,21 @@ export class EmployeeRepository{
         if(resultCheckCpf.rows.length > 0){
             return null
         } else {
-            const sqlCreate = "INSERT INTO employee (name, job_position, cpf, date_of_birth, start_date, date_layoff, status_employee, cod_company) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *"
-            const valuesCreate = [nameLowerCase, job_positionLowerCase, cpf, date_of_birth, start_date, date_layoff, default_status_employee, cod_company]
+
+            const sqlCompany = "SELECT social_name, cnpj FROM company WHERE cod_company = $1"
+            const resultCompany = await db_query_params(sqlCompany, [cod_company])
+            const company = resultCompany.rows[0]
+            const social_name = company.social_name
+            const cnpj = company.cnpj
+
+            const date_layoff = ""
+
+            const namePdf = await PdfEmployee.createPdfEmployee({nameLowerCase, job_positionLowerCase, start_date, date_layoff, social_name, cnpj, cpf})
+
+
+            const sqlCreate = "INSERT INTO employee_test (name, job_position, cpf, date_of_birth, start_date, date_layoff, status_employee, cod_company, content_pdf) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *"
+            const valuesCreate = [nameLowerCase, job_positionLowerCase, cpf, date_of_birth, start_date, date_layoff_parametro, default_status_employee, cod_company, namePdf]
+
 
             const resultEmployee = await db_query_params(sqlCreate, valuesCreate)
 
