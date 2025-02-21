@@ -60,7 +60,7 @@ export class EmployeeRepository{
 
 
     static async showEmployeeAll(){
-        const sql = "SELECT * FROM employee"
+        const sql = "SELECT * FROM employee_test"
         const employees = await db_query(sql)
 
         return employees.rows
@@ -199,7 +199,7 @@ export class EmployeeRepository{
         const nameLowerCase = name.toLocaleLowerCase()
         const job_positionLowerCase = job_position.toLocaleLowerCase()
 
-        const sqlCheckCpf = "SELECT cpf FROM employee WHERE cpf = $1 and cod_employee != $2"
+        const sqlCheckCpf = "SELECT cpf FROM employee_test WHERE cpf = $1 and cod_employee != $2"
         const valueCheckCpf = [cpf, id]
         const resultCheckCpf = await db_query_params(sqlCheckCpf, valueCheckCpf)
         console.log(resultCheckCpf.rows)
@@ -208,12 +208,29 @@ export class EmployeeRepository{
             return null
         } else {
 
-            const sqlUpdateCpf = "UPDATE employee SET cpf = $1 WHERE cod_employee = $2 RETURNING *"
+            const sqlUpdateCpf = "UPDATE employee_test SET cpf = $1 WHERE cod_employee = $2 RETURNING *"
             const valueCpf = [cpf, id]
             const cpfUpdated = await db_query_params(sqlUpdateCpf, valueCpf)
 
-            const sqlUpdateEmployee = "UPDATE employee SET name = $1, job_position = $2, date_of_birth = $3, start_date = $4, date_layoff = $5, status_employee = $6, cod_company = $7 WHERE cod_employee = $8 RETURNING *"
-            const valuesUpdateEmployee = [nameLowerCase, job_positionLowerCase, date_of_birth, start_date, date_layoff, status_employee, cod_company, id]
+            const sqlCompany = "SELECT social_name, cnpj FROM company WHERE cod_company = $1"
+            const resultCompany = await db_query_params(sqlCompany, [cod_company])
+            const company = resultCompany.rows[0]
+            const social_name = company.social_name
+            const cnpj = company.cnpj
+
+
+            const sqlNamePdfEmployee = "SELECT content_pdf FROM employee_test WHERE cod_employee = $1"
+            const getNamePdf = await db_query_params(sqlNamePdfEmployee, [id])
+
+
+            const updateFilePdf = await PdfEmployee.updatePdfEmployee(getNamePdf.rows[0], {nameLowerCase, job_positionLowerCase, start_date, date_layoff, social_name, cnpj, cpf})
+
+            const namePdfReal = updateFilePdf != getNamePdf.rows[0] ? updateFilePdf : getNamePdf
+
+            console.log("teste 3", namePdfReal)
+
+            const sqlUpdateEmployee = "UPDATE employee_test SET name = $1, job_position = $2, date_of_birth = $3, start_date = $4, date_layoff = $5, status_employee = $6, cod_company = $7, content_pdf = $8 WHERE cod_employee = $9 RETURNING *"
+            const valuesUpdateEmployee = [nameLowerCase, job_positionLowerCase, date_of_birth, start_date, date_layoff, status_employee, cod_company, namePdfReal, id]
             const employeeUpdated = await db_query_params(sqlUpdateEmployee, valuesUpdateEmployee)
 
             const resultEmployee = employeeUpdated.rows[0]

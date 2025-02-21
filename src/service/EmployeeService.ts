@@ -57,7 +57,7 @@ export class EmployeeService {
     static async updateEmployee(id: number, attributes: {name: string, job_position: string, cpf: string, date_of_birth: string, start_date: string, date_layoff: string | null, status_employee: boolean, cod_company: number}){
         const { name, job_position, cpf, date_of_birth, start_date, date_layoff, status_employee, cod_company } = attributes
 
-        if(!name || !job_position || !cpf || !date_of_birth || !start_date || !date_layoff || !status_employee || !cod_company){
+        if(!name || !job_position || !cpf || !date_of_birth || !start_date || !status_employee || !cod_company){
             throw new HttpError(400, "Todos os dados são obrigatórios")
         } else {
 
@@ -71,7 +71,9 @@ export class EmployeeService {
 
             // CHECK FORMAT DATE BIRTH
             const check_date_layoff = /^\d{2}\/\d{2}\/\d{4}$/
-            if(!check_date_layoff.test(date_layoff)) throw new HttpError(400, "A data inserida está incorreta, ex: (dd/mm/aaaa)")
+            if(date_layoff != null){
+                if(!check_date_layoff.test(date_layoff)) throw new HttpError(400, "A data inserida está incorreta, ex: (dd/mm/aaaa)")
+            }
             
             // CHECK FORMAT CPF
             const checkCpfIsNumber = /^\d{11}$/
