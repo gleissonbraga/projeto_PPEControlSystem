@@ -62,7 +62,6 @@ export class ControlEpiRepository{
         const social_name = employee.social_name
         const cnpj = employee.cnpj
 
-        console.log(cnpj)
 
         const sql = `SELECT 
         pe.name_epi, 

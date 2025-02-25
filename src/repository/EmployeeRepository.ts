@@ -202,7 +202,7 @@ export class EmployeeRepository{
         const sqlCheckCpf = "SELECT cpf FROM employee_test WHERE cpf = $1 and cod_employee != $2"
         const valueCheckCpf = [cpf, id]
         const resultCheckCpf = await db_query_params(sqlCheckCpf, valueCheckCpf)
-        console.log(resultCheckCpf.rows)
+
 
         if(resultCheckCpf.rows.length > 0) {
             return null
@@ -219,15 +219,37 @@ export class EmployeeRepository{
             const cnpj = company.cnpj
 
 
-            const sqlNamePdfEmployee = "SELECT content_pdf FROM employee_test WHERE cod_employee = $1"
-            const getNamePdf = await db_query_params(sqlNamePdfEmployee, [id])
+            const sqlNamePdfEmployee = "SELECT * FROM employee_test WHERE cod_employee = $1"
+            const getUser = await db_query_params(sqlNamePdfEmployee, [id])
 
+            const user = getUser.rows[0]
+            const employeeName = user.name
+            const employeeJobPosition = user.job_position
+            const employeeStartDate = user.start_date
+            const employeeDateLayoff = user.date_layoff
+            const employeeCpf = user.cpf
+            const employeeCodCompany = user.cod_company
 
-            const updateFilePdf = await PdfEmployee.updatePdfEmployee(getNamePdf.rows[0], {nameLowerCase, job_positionLowerCase, start_date, date_layoff, social_name, cnpj, cpf})
+            const sql = `SELECT 
+            pe.name_epi, 
+            pe.color, 
+            pe.size,
+            p.date_delivery, 
+            c.cnpj 
+            FROM control_epi as p 
+            JOIN employee_test e ON (e.cod_employee = p.cod_employee) 
+            JOIN company c ON (c.cod_company = e.cod_company) 
+            JOIN product_epi pe ON (pe.cod_epi = pe.cod_epi) 
+            WHERE e.cod_employee = $1 AND c.cod_company = $2`
+            const value = [id, employeeCodCompany]
+            const getListUserEpi = await db_query_params(sql, value)
+            const dataEpis = getListUserEpi.rows
 
-            const namePdfReal = updateFilePdf != getNamePdf.rows[0] ? updateFilePdf : getNamePdf
+            
+            const updateFilePdf = await PdfEmployee.updatePdfEmployee({content_pdf: user.content_pdf}, {employeeName, employeeJobPosition, employeeStartDate, employeeDateLayoff, social_name,cnpj, employeeCpf}, dataEpis)
+            
+            const namePdfReal = updateFilePdf != user.content_pdf ? updateFilePdf : user.content_pdf
 
-            console.log("teste 3", namePdfReal)
 
             const sqlUpdateEmployee = "UPDATE employee_test SET name = $1, job_position = $2, date_of_birth = $3, start_date = $4, date_layoff = $5, status_employee = $6, cod_company = $7, content_pdf = $8 WHERE cod_employee = $9 RETURNING *"
             const valuesUpdateEmployee = [nameLowerCase, job_positionLowerCase, date_of_birth, start_date, date_layoff, status_employee, cod_company, namePdfReal, id]
@@ -262,7 +284,4 @@ export class EmployeeRepository{
         return result.rows[0]
 
     }
-
-    
- 
 }

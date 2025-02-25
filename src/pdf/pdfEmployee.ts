@@ -2,6 +2,7 @@ import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from 'uuid';
+import { format, parseISO } from 'date-fns';
 
 // nome
 // função
@@ -166,11 +167,10 @@ export class PdfEmployee {
       cellX += colWidths[i];
     });
 
-    const shortUUID = uuidv4().slice(0, 8); // Pega apenas os primeiros 8 caracteres
 
     const pdfBytes = await pdfDoc.save();
     const pdfDir = path.resolve(__dirname, "../uploads");
-    const filename = `${nameLowerCase.replace(/\s+/g, "_")}_${shortUUID}.pdf`;
+    const filename = `${nameLowerCase.replace(/\s+/g, "_")}_${cpf}.pdf`;
     const pdfPath = path.join(pdfDir, filename);
 
     if (!fs.existsSync(pdfDir)) {
@@ -189,34 +189,34 @@ export class PdfEmployee {
     static async updatePdfEmployee(
       pdfFileEmployee: { content_pdf: string },
       dados: {
-        nameLowerCase: string;
-        job_positionLowerCase: string;
-        start_date: string;
-        date_layoff: string | null;
+        employeeName: string;
+        employeeJobPosition: string;
+        employeeStartDate: string;
+        employeeDateLayoff: string | null;
         social_name: string;
         cnpj: string;
-        cpf: string;
-      }
+        employeeCpf: string;
+      }, epis: {date_delivery: string, name_epi: string; color: string; size: string}[]
     ) {
       const {
-        nameLowerCase,
-        job_positionLowerCase,
-        start_date,
-        date_layoff,
+        employeeName,
+        employeeJobPosition,
+        employeeStartDate,
+        employeeDateLayoff,
         social_name,
         cnpj,
-        cpf,
+        employeeCpf,
       } = dados;
 
-      const nameTitleCase = await this.toTitleCase(nameLowerCase)
-      const jobPositionTitleCase = await this.toTitleCase(job_positionLowerCase)
+
+      const nameTitleCase = await this.toTitleCase(employeeName)
+      const jobPositionTitleCase = await this.toTitleCase(employeeJobPosition)
       const socialNameTitleCase = await this.toTitleCase(social_name)
+      const dateLayOff = employeeDateLayoff == null ? "" : format(employeeDateLayoff, 'dd/MM/yyyy')
   
       const { content_pdf } = pdfFileEmployee;
-      
-      const shortUUID = uuidv4().slice(0, 8)
 
-      const newFileName = `${nameLowerCase.replace(/\s+/g, "_")}_${shortUUID}.pdf`;
+      const newFileName = `${employeeName.replace(/\s+/g, "_")}_${employeeCpf}.pdf`;
       const currentFilePath = path.resolve(__dirname, "../uploads", content_pdf);
       const newFilePath = path.resolve(__dirname, "../uploads", newFileName);
   
@@ -256,13 +256,16 @@ export class PdfEmployee {
         end: { x: 780, y: startY },
         thickness: 2,
       });
+
+      
+
   
       startY -= 30;
       const info = [
         [`EMPRESA: ${socialNameTitleCase}`, `CNPJ: ${cnpj}`],
-        [`FUNCIONÁRIO: ${nameTitleCase}`, `CPF: ${cpf}`],
+        [`FUNCIONÁRIO: ${nameTitleCase}`, `CPF: ${employeeCpf}`],
         [`CARGO: ${jobPositionTitleCase}`, `SETOR: TESTE`],
-        [`ADMISSÃO: ${start_date}`, `DEMISSÃO: ${date_layoff ?? ""}`],
+        [`ADMISSÃO: ${employeeStartDate}`, `DEMISSÃO: ${dateLayOff}`],
       ];
   
       info.forEach(([leftText, rightText]) => {
@@ -540,9 +543,15 @@ export class PdfEmployee {
         startY -= 25;
       });
     
-      const updatedFilePdf = await pdfDoc.save()
-    
-      return updatedFilePdf;
+      const updatedFilePdf = await pdfDoc.save();
+  
+      if (currentFilePath !== newFilePath) {
+        fs.renameSync(currentFilePath, newFilePath);
+      }
+  
+      fs.writeFileSync(newFilePath, updatedFilePdf);
+  
+      return newFileName;
     }
     
 
