@@ -76,6 +76,7 @@ export class Product_EpiRepository{
         const valuesUpdate = [ cod_category_epi, name_epiLowerCase, colorLowerCase, sizeLowercase, id ]
 
         const resultUpdate = await db_query_params(sqlUpdate, valuesUpdate)
+        
 
         const productUpdated = resultUpdate.rows[0]
 
