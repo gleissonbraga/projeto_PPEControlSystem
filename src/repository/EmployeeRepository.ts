@@ -235,7 +235,7 @@ export class EmployeeRepository{
             const employeeName = user.name
             const employeeJobPosition = user.job_position
             const employeeStartDate = user.start_date
-            const employeeDateLayoff = format(user.date_layoff, 'MM/dd/yyyy')
+            const employeeDateLayoff = format(user.date_layoff, 'dd/MM/yyyy')
             const employeeCpf = user.cpf
             const employeeCodCompany = user.cod_company
 

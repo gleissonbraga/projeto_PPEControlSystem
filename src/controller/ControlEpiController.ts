@@ -33,12 +33,12 @@ export class ControlEpiControl{
         }
     }
 
-    // DELETE controle/epi/deletar/:id
+    // DELETE controle/epi/deletar/:id_epi/funcionario/:id_funcionario
     deleteControlEpi: Handler = async (req, res) =>{
-        const { id } = req.params
+        const { id_epi, id_employee } = req.params
 
         try {
-            const deletedControl = await ControlEpiService.deleteControlEpi(+id)
+            const deletedControl = await ControlEpiService.deleteControlEpi(+id_epi, +id_employee)
             res.json(deletedControl)
         } catch (error) {
             if(error instanceof HttpError){
@@ -47,7 +47,7 @@ export class ControlEpiControl{
         }
     }
 
-    // GET controle/epi/funcionari/:id_employe/empresa/:id_company
+    // GET controle/epi/funcionario/:id_employe/empresa/:id_company
 
     getControlByCompanyAndEmployee: Handler = async (req, res) => {
         const { id_employee, id_company } = req.params

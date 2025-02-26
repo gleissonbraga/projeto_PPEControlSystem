@@ -20,12 +20,12 @@ export class ControlEpiService{
         }
     }
 
-    static async deleteControlEpi(id: number){
+    static async deleteControlEpi(id_epi: number, id_employee: number){
 
-        if(!id){
+        if(!id_epi){
             throw new HttpError(400, "Insira um valor")
         } else {
-            const controlEpi = await ControlEpiRepository.deleteControlEpi(id)
+            const controlEpi = await ControlEpiRepository.deleteControlEpi(id_epi, id_employee)
             return controlEpi
         }
     }
