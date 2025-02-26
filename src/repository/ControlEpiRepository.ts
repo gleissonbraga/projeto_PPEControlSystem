@@ -54,16 +54,17 @@ export class ControlEpiRepository{
         const getEmployee = await db_query_params(sqlNamePdfEmployee, [cod_employee])
         const employee = getEmployee.rows[0]
 
-        const nameEmployee = employee.name
-        const job_positionLowerCase = employee.job_position
-        const start_date = employee.start_date
-        const date_layoff = employee.date_layoff
-        const cpf = employee.cpf
+        const employeeName = employee.name
+        const employeeJobPosition = employee.job_position
+        const employeeStartDate = employee.start_date
+        const employeeDateLayoff = employee.date_layoff
+        const employeeCpf = employee.cpf
         const social_name = employee.social_name
         const cnpj = employee.cnpj
 
-
+    
         const sql = `SELECT 
+        ROW_NUMBER() OVER () AS rows_epi,
         pe.name_epi, 
         pe.color, 
         pe.size,
@@ -72,18 +73,14 @@ export class ControlEpiRepository{
         FROM control_epi as p 
         JOIN employee_test e ON (e.cod_employee = p.cod_employee) 
         JOIN company c ON (c.cod_company = e.cod_company) 
-        JOIN product_epi pe ON (pe.cod_epi = pe.cod_epi) 
+        JOIN product_epi pe ON (pe.cod_epi = p.cod_epi) 
         WHERE e.cod_employee = $1 AND c.cod_company = $2`
         const value = [cod_employee, employee.cod_company]
         const getListUserEpi = await db_query_params(sql, value)
         const dataEpis = getListUserEpi.rows
-
-        // console.log("teste 01 = lista epis", dataEpis)
         
 
-        const pdf = await PdfEmployee.updatePdfControlEpi({content_pdf: employee.content_pdf},{nameEmployee, job_positionLowerCase, start_date, date_layoff, social_name, cnpj, cpf}, dataEpis)
-
-        console.log("teste volta do pdf", pdf)
+        const pdf = await PdfEmployee.updatePdfEmployee({content_pdf: employee.content_pdf},{employeeName, employeeJobPosition, employeeStartDate, employeeDateLayoff, social_name, cnpj, employeeCpf}, dataEpis)
 
         return result.rows[0]
     }

@@ -1,5 +1,6 @@
 import { Database } from "../config/db"
 import { PdfEmployee } from "../pdf/pdfEmployee"
+import { format, parseISO } from 'date-fns';
 
 const openDbConnection = Database.openDbConnection
 const endDbConnection = Database.endDbConnection
@@ -196,6 +197,8 @@ export class EmployeeRepository{
     static async updateEmployee(id: number, attributes: EmployeeAttribute){
         const { name, job_position, cpf, date_of_birth, start_date, date_layoff, status_employee, cod_company } = attributes
 
+
+
         const nameLowerCase = name.toLocaleLowerCase()
         const job_positionLowerCase = job_position.toLocaleLowerCase()
 
@@ -218,6 +221,12 @@ export class EmployeeRepository{
             const social_name = company.social_name
             const cnpj = company.cnpj
 
+            
+            const sqlUpdateEmployee = "UPDATE employee_test SET name = $1, job_position = $2, date_of_birth = $3, start_date = $4, date_layoff = $5, status_employee = $6, cod_company = $7 WHERE cod_employee = $8 RETURNING *"
+            const valuesUpdateEmployee = [nameLowerCase, job_positionLowerCase, date_of_birth, start_date, date_layoff, status_employee, cod_company, id]
+            const employeeUpdated = await db_query_params(sqlUpdateEmployee, valuesUpdateEmployee)
+
+
 
             const sqlNamePdfEmployee = "SELECT * FROM employee_test WHERE cod_employee = $1"
             const getUser = await db_query_params(sqlNamePdfEmployee, [id])
@@ -226,11 +235,12 @@ export class EmployeeRepository{
             const employeeName = user.name
             const employeeJobPosition = user.job_position
             const employeeStartDate = user.start_date
-            const employeeDateLayoff = user.date_layoff
+            const employeeDateLayoff = format(user.date_layoff, 'MM/dd/yyyy')
             const employeeCpf = user.cpf
             const employeeCodCompany = user.cod_company
 
-            const sql = `SELECT 
+            const sql = `SELECT
+            ROW_NUMBER() OVER () AS linha,
             pe.name_epi, 
             pe.color, 
             pe.size,
@@ -239,24 +249,21 @@ export class EmployeeRepository{
             FROM control_epi as p 
             JOIN employee_test e ON (e.cod_employee = p.cod_employee) 
             JOIN company c ON (c.cod_company = e.cod_company) 
-            JOIN product_epi pe ON (pe.cod_epi = pe.cod_epi) 
+            JOIN product_epi pe ON (pe.cod_epi = p.cod_epi) 
             WHERE e.cod_employee = $1 AND c.cod_company = $2`
             const value = [id, employeeCodCompany]
             const getListUserEpi = await db_query_params(sql, value)
             const dataEpis = getListUserEpi.rows
 
-            
+
             const updateFilePdf = await PdfEmployee.updatePdfEmployee({content_pdf: user.content_pdf}, {employeeName, employeeJobPosition, employeeStartDate, employeeDateLayoff, social_name,cnpj, employeeCpf}, dataEpis)
             
             const namePdfReal = updateFilePdf != user.content_pdf ? updateFilePdf : user.content_pdf
-
-
-            const sqlUpdateEmployee = "UPDATE employee_test SET name = $1, job_position = $2, date_of_birth = $3, start_date = $4, date_layoff = $5, status_employee = $6, cod_company = $7, content_pdf = $8 WHERE cod_employee = $9 RETURNING *"
-            const valuesUpdateEmployee = [nameLowerCase, job_positionLowerCase, date_of_birth, start_date, date_layoff, status_employee, cod_company, namePdfReal, id]
-            const employeeUpdated = await db_query_params(sqlUpdateEmployee, valuesUpdateEmployee)
+            const sqlUpdatePdf = "UPDATE employee_test SET content_pdf = $1 WHERE cod_employee = $2"
+            const valuesUpdatePdf = [namePdfReal, id]
+            const namePdfupdate = await db_query_params(sqlUpdatePdf, valuesUpdatePdf)
 
             const resultEmployee = employeeUpdated.rows[0]
-
             return resultEmployee
             
         }

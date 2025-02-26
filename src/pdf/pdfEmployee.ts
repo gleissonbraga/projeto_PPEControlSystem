@@ -2,7 +2,8 @@ import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from 'uuid';
-import { format, parseISO } from 'date-fns';
+import { format } from "date-fns";
+
 
 // nome
 // função
@@ -55,7 +56,7 @@ export class PdfEmployee {
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage([842, 595]);
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const fontSize = 12;
+    const fontSize = 11;
 
     let startY = 550;
     const startX = 50;
@@ -72,7 +73,7 @@ export class PdfEmployee {
       }
     );
 
-    startY -= 30;
+    startY -= 24;
     page.drawLine({
       start: { x: startX, y: startY },
       end: { x: 780, y: startY },
@@ -80,7 +81,7 @@ export class PdfEmployee {
     });
 
     // 🔹 Informações do funcionário e empresa
-    startY -= 30;
+    startY -= 22;
     const info = [
       [`EMPRESA: ${socialNameTitleCase}`, `CNPJ: ${cnpj}`],
       [`FUNCIONÁRIO: ${nameTitleCase}`, `CPF: ${cpf}`],
@@ -92,9 +93,9 @@ export class PdfEmployee {
     ];
 
     info.forEach(([leftText, rightText]) => {
-      page.drawText(leftText, { x: startX, y: startY, size: fontSize, font });
-      page.drawText(rightText, { x: 450, y: startY, size: fontSize, font });
-      startY -= 25;
+      page.drawText(leftText, { x: startX, y: startY, size: fontSize + 1, font });
+      page.drawText(rightText, { x: 450, y: startY, size: fontSize + 1, font });
+      startY -= 22;
     });
 
     page.drawLine({
@@ -104,7 +105,7 @@ export class PdfEmployee {
     });
 
     // 🔹 Termo de responsabilidade
-    startY -= 20;
+    startY -= 18;
     const termo = [
       `Recebi da Empresa "${socialNameTitleCase}", para meu uso obrigatório os EPI's (Equipamento de Proteção Individual)`,
       ` constantes nesta ficha, os quais obrigo-me utilizá-los corretamente durante o tempo que permanecer ao meu dispor, observando as `,
@@ -138,14 +139,15 @@ export class PdfEmployee {
       thickness: 2,
     });
     // 🔹 Cabeçalho da tabela
-    startY -= 50;
-    const colWidths = [100, 100, 250, 120, 180];
+    startY -= 36;
+    const colWidths = [100, 240, 80, 70, 100, 180];
     const headers = [
-      "Data",
-      "Tamanho",
-      "Descrição Equipamento",
+      "DATA",
+      "EQUIPAMENTO",
+      "COR",
+      "TAMANHO",
       "N° do CA",
-      "Assinatura",
+      "ASSINATURA",
     ];
 
     let cellX = startX;
@@ -196,7 +198,7 @@ export class PdfEmployee {
         social_name: string;
         cnpj: string;
         employeeCpf: string;
-      }, epis: {date_delivery: string, name_epi: string; color: string; size: string}[]
+      }, epis: {rows_epi: string ,date_delivery: string, name_epi: string; color: string; size: string}[]
     ) {
       const {
         employeeName,
@@ -212,7 +214,7 @@ export class PdfEmployee {
       const nameTitleCase = await this.toTitleCase(employeeName)
       const jobPositionTitleCase = await this.toTitleCase(employeeJobPosition)
       const socialNameTitleCase = await this.toTitleCase(social_name)
-      const dateLayOff = employeeDateLayoff == null ? "" : format(employeeDateLayoff, 'dd/MM/yyyy')
+      const dateLayOff = employeeDateLayoff == null ? "" : employeeDateLayoff
   
       const { content_pdf } = pdfFileEmployee;
 
@@ -226,7 +228,7 @@ export class PdfEmployee {
       let page = pdfDoc.getPage(0);
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
       const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-      const fontSize = 12;
+      const fontSize = 11;
 
       page.drawRectangle({
         x: 0,
@@ -250,17 +252,16 @@ export class PdfEmployee {
         }
       );
   
-      startY -= 30;
+      startY -= 24;
       page.drawLine({
         start: { x: startX, y: startY },
         end: { x: 780, y: startY },
         thickness: 2,
       });
 
-      
-
+    
   
-      startY -= 30;
+      startY -= 22;
       const info = [
         [`EMPRESA: ${socialNameTitleCase}`, `CNPJ: ${cnpj}`],
         [`FUNCIONÁRIO: ${nameTitleCase}`, `CPF: ${employeeCpf}`],
@@ -269,9 +270,9 @@ export class PdfEmployee {
       ];
   
       info.forEach(([leftText, rightText]) => {
-        page.drawText(leftText, { x: startX, y: startY, size: fontSize, font });
-        page.drawText(rightText, { x: 450, y: startY, size: fontSize, font });
-        startY -= 25;
+        page.drawText(leftText, { x: startX, y: startY, size: fontSize + 1, font });
+        page.drawText(rightText, { x: 450, y: startY, size: fontSize + 1, font });
+        startY -= 22;
       });
   
       page.drawLine({
@@ -280,7 +281,7 @@ export class PdfEmployee {
         thickness: 2,
       });
   
-      startY -= 20;
+      startY -= 18;
       const termo = [
         `Recebi da Empresa "${social_name.toUpperCase()}", para meu uso obrigatório os EPI's (Equipamento de Proteção Individual)`,
         `constantes nesta ficha, os quais obrigo-me utilizá-los corretamente durante o tempo que permanecer ao meu dispor, observando as`,
@@ -313,14 +314,16 @@ export class PdfEmployee {
         thickness: 2,
       });
   
-      startY -= 50;
-      const colWidths = [100, 100, 250, 120, 180];
+      startY -= 36;
+      const colWidths = [26, 100, 220, 70, 70, 90, 170];
       const headers = [
-        "Data",
-        "Tamanho",
-        "Descrição Equipamento",
+        " ",
+        "DATA",
+        "EQUIPAMENTO",
+        "COR",
+        "TAMANHO",
         "N° do CA",
-        "Assinatura",
+        "ASSINATURA",
       ];
   
       let cellX = startX;
@@ -341,208 +344,49 @@ export class PdfEmployee {
         });
         cellX += colWidths[i];
       });
-  
-      const updatedFilePdf = await pdfDoc.save();
-  
-      if (currentFilePath !== newFilePath) {
-        fs.renameSync(currentFilePath, newFilePath);
-      }
-  
-      fs.writeFileSync(newFilePath, updatedFilePdf);
-  
-      return newFileName;
-    }
 
-    // _________________________________________________________________________________________
+      startY -= 30;
 
-    static async updatePdfControlEpi(
-      pdfFileEmployee: { content_pdf: string },
-      dados: {
-        nameEmployee: string;
-        job_positionLowerCase: string;
-        start_date: string;
-        date_layoff: string | null;
-        social_name: string;
-        cnpj: string;
-        cpf: string;
-      },
-      epis: {date_delivery: string, name_epi: string; color: string; size: string}[] // ⬅️ Recebendo os EPIs aqui
-    ) {
+      const minY = 50;
+      const pageHeight = page.getHeight();
 
-      // "Data", "Tamanho", "Descrição Equipamento", "N° do CA", "Assinatura"
-      const {
-        nameEmployee,
-        job_positionLowerCase,
-        start_date,
-        date_layoff,
-        social_name,
-        cnpj,
-        cpf,
-      } = dados;
 
-      console.log(epis)
-
-      const {content_pdf} = pdfFileEmployee
-    
-      const nameTitleCase = await this.toTitleCase(nameEmployee);
-      const jobPositionTitleCase = await this.toTitleCase(job_positionLowerCase);
-      const socialNameTitleCase = await this.toTitleCase(social_name);
-    
-      console.log(nameTitleCase,jobPositionTitleCase,socialNameTitleCase)
-      const shortUUID = uuidv4().slice(0, 8);
-      const newFileName = `${nameEmployee.replace(/\s+/g, "_")}_${shortUUID}.pdf`;
-    
-      const currentFilePath = path.resolve(__dirname, "../uploads", content_pdf);
-      const newFilePath = path.resolve(__dirname, "../uploads", newFileName);
-    
-      const updateFile = fs.readFileSync(currentFilePath);
-      let pdfDoc = await PDFDocument.load(updateFile);
-      let page = pdfDoc.getPage(0);
-      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-      const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-      const fontSize = 12;
-    
-      page.drawRectangle({
-        x: 0,
-        y: 0,
-        width: 842,
-        height: 545,
-        color: rgb(1, 1, 1),
-      });
-    
-      let startY = 550;
-      const startX = 50;
-    
-      page.drawText(
-        "FICHA DE FORNECIMENTO DE EQUIPAMENTO DE PROTEÇÃO INDIVIDUAL (EPI)",
-        {
-          x: 90,
-          y: startY,
-          size: 14,
-          font,
-          color: rgb(0, 0, 0),
+      epis.forEach(({rows_epi, date_delivery, name_epi, color, size }) => {
+        if (startY < minY) {
+          page = pdfDoc.addPage([842, pageHeight]);
+          page.setFont(font);
+          startY = pageHeight - 50
         }
-      );
-    
-      startY -= 30;
-      page.drawLine({
-        start: { x: startX, y: startY },
-        end: { x: 780, y: startY },
-        thickness: 2,
-      });
-    
-      startY -= 30;
-      const info = [
-        [`EMPRESA: ${socialNameTitleCase}`, `CNPJ: ${cnpj}`],
-        [`FUNCIONÁRIO: ${nameTitleCase}`, `CPF: ${cpf}`],
-        [`CARGO: ${jobPositionTitleCase}`, `SETOR: TESTE`],
-        [`ADMISSÃO: ${start_date}`, `DEMISSÃO: ${date_layoff ?? ""}`],
-      ];
-    
-      info.forEach(([leftText, rightText]) => {
-        page.drawText(leftText, { x: startX, y: startY, size: fontSize, font: fontBold });
-        page.drawText(rightText, { x: 450, y: startY, size: fontSize, font: fontBold });
-        startY -= 25;
-      });
-    
-      page.drawLine({
-        start: { x: startX, y: startY },
-        end: { x: 780, y: startY },
-        thickness: 2,
-      });
-    
-      startY -= 20;
-      const termo = [
-        `Recebi da Empresa "${social_name.toUpperCase()}", para meu uso obrigatório os EPI's (Equipamento de Proteção Individual)`,
-        `constantes nesta ficha, os quais obrigo-me utilizá-los corretamente durante o tempo que permanecer ao meu dispor, observando as`,
-        `medidas gerais de disciplina e uso que integram a NR-06 - Equipamento de Proteção Individual - EPI's - da portaria nº 3.214 de 08/jun/1970.`,
-        `Declaro saber também que terei que devolvê-los no ato de meu desligamento da empresa.`,
-      ];
-    
-      termo.forEach((line) => {
-        page.drawText(line, { x: startX, y: startY, size: fontSize, font });
-        startY -= 20;
-      });
-    
-      startY -= 10;
-      page.drawText("ASSINATURA COLABORADOR:", {
-        x: startX,
-        y: startY,
-        size: fontSize,
-        font: fontBold,
-      });
-      page.drawLine({
-        start: { x: 230, y: startY - 5 },
-        end: { x: 650, y: startY - 5 },
-        thickness: 1,
-      });
-    
-      startY -= 16;
-      page.drawLine({
-        start: { x: startX, y: startY },
-        end: { x: 780, y: startY },
-        thickness: 2,
-      });
-    
-      startY -= 50;
-      const colWidths = [100, 100, 250, 120, 180];
-      const headers = ["Data", "Tamanho", "Descrição Equipamento", "N° do CA", "Assinatura"];
-    
-      let cellX = startX;
-      headers.forEach((header, i) => {
-        page.drawRectangle({
-          x: cellX,
-          y: startY,
-          width: colWidths[i],
-          height: 25,
-          borderColor: rgb(0, 0, 0),
-          borderWidth: 1,
-        });
-        page.drawText(header, {
-          x: cellX + 10,
-          y: startY + 7,
-          size: fontSize,
-          font: fontBold,
-        });
-        cellX += colWidths[i];
-      });
-    
-      startY -= 30;
-    
-      // 🔹 Adicionando EPIs ao PDF
-      epis.forEach((epi) => {
-        let cellX = startX;
-        const rowValues = [
-          epi.date_delivery, // Data de entrega
-          epi.size.toUpperCase(), // Tamanho
-          epi.name_epi.charAt(0).toUpperCase() + epi.name_epi.slice(1), // Nome do EPI
-          "00000", // Número do CA (mock)
-          "____________________", // Assinatura
-        ];
-    
-        rowValues.forEach((value, i) => {
+        const dateDeliveryFormat = format(date_delivery, "dd/MM/yyyy")
+        console.log(date_delivery)
+        console.log(dateDeliveryFormat)
+  
+        let colX = startX;
+
+        const nameUppercase = name_epi.toUpperCase()
+        const nameColor = color.toUpperCase()
+        const nameSize = size.toUpperCase()
+        const rows = rows_epi
+
+        const rowData = [rows, dateDeliveryFormat, nameUppercase, nameColor, nameSize, "XXXXX", "_______________________"];
+  
+        rowData.forEach((data, i) => {
           page.drawRectangle({
-            x: cellX,
+            x: colX,
             y: startY,
             width: colWidths[i],
-            height: 25,
+            height: 30,
             borderColor: rgb(0, 0, 0),
             borderWidth: 1,
           });
-    
-          page.drawText(value, {
-            x: cellX + 10,
-            y: startY + 7,
-            size: fontSize,
-            font,
-          });
-    
-          cellX += colWidths[i];
+  
+          page.drawText(data, { x: colX + 10, y: startY + 7, size: fontSize, font });
+          colX += colWidths[i];
         });
-    
-        startY -= 25;
+  
+        startY -= 30;
       });
-    
+  
       const updatedFilePdf = await pdfDoc.save();
   
       if (currentFilePath !== newFilePath) {
@@ -553,171 +397,5 @@ export class PdfEmployee {
   
       return newFileName;
     }
-    
-
 
   }
-  
-  // static async updatePdfControlEpi(
-  //   pdfFileEmployee: { content_pdf: string },
-  //   dados: {
-  //     nameLowerCase: string;
-  //     job_positionLowerCase: string;
-  //     start_date: string;
-  //     date_layoff: string | null;
-  //     social_name: string;
-  //     cnpj: string;
-  //     cpf: string;
-  //   }
-  // ) {
-  //   const {
-  //     nameLowerCase,
-  //     job_positionLowerCase,
-  //     start_date,
-  //     date_layoff,
-  //     social_name,
-  //     cnpj,
-  //     cpf,
-  //   } = dados;
-
-  //   const nameTitleCase = await this.toTitleCase(nameLowerCase)
-  //   const jobPositionTitleCase = await this.toTitleCase(job_positionLowerCase)
-  //   const socialNameTitleCase = await this.toTitleCase(social_name)
-
-  //   const { content_pdf } = pdfFileEmployee;
-    
-  //   const shortUUID = uuidv4().slice(0, 8)
-
-  //   const newFileName = `${nameLowerCase.replace(/\s+/g, "_")}_${shortUUID}.pdf`;
-  //   const currentFilePath = path.resolve(__dirname, "../uploads", content_pdf);
-  //   const newFilePath = path.resolve(__dirname, "../uploads", newFileName);
-
-
-  //   const updateFile = fs.readFileSync(currentFilePath);
-  //   let pdfDoc = await PDFDocument.load(updateFile);
-  //   let page = pdfDoc.getPage(0);
-  //   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  //   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  //   const fontSize = 12;
-
-  //   page.drawRectangle({
-  //     x: 0,
-  //     y: 0,
-  //     width: 842,
-  //     height: 545,
-  //     color: rgb(1, 1, 1)
-  //   });
-
-  //   let startY = 550;
-  //   const startX = 50;
-
-  //   page.drawText(
-  //     "FICHA DE FORNECIMENTO DE EQUIPAMENTO DE PROTEÇÃO INDIVIDUAL (EPI)",
-  //     {
-  //       x: 90,
-  //       y: startY,
-  //       size: 14,
-  //       font,
-  //       color: rgb(0, 0, 0),
-  //     }
-  //   );
-
-  //   startY -= 30;
-  //   page.drawLine({
-  //     start: { x: startX, y: startY },
-  //     end: { x: 780, y: startY },
-  //     thickness: 2,
-  //   });
-
-  //   startY -= 30;
-  //   const info = [
-  //     [`EMPRESA: ${socialNameTitleCase}`, `CNPJ: ${cnpj}`],
-  //     [`FUNCIONÁRIO: ${nameTitleCase}`, `CPF: ${cpf}`],
-  //     [`CARGO: ${jobPositionTitleCase}`, `SETOR: TESTE`],
-  //     [`ADMISSÃO: ${start_date}`, `DEMISSÃO: ${date_layoff ?? ""}`],
-  //   ];
-
-  //   info.forEach(([leftText, rightText]) => {
-  //     page.drawText(leftText, { x: startX, y: startY, size: fontSize, font });
-  //     page.drawText(rightText, { x: 450, y: startY, size: fontSize, font });
-  //     startY -= 25;
-  //   });
-
-  //   page.drawLine({
-  //     start: { x: startX, y: startY },
-  //     end: { x: 780, y: startY },
-  //     thickness: 2,
-  //   });
-
-  //   startY -= 20;
-  //   const termo = [
-  //     `Recebi da Empresa "${social_name.toUpperCase()}", para meu uso obrigatório os EPI's (Equipamento de Proteção Individual)`,
-  //     `constantes nesta ficha, os quais obrigo-me utilizá-los corretamente durante o tempo que permanecer ao meu dispor, observando as`,
-  //     `medidas gerais de disciplina e uso que integram a NR-06 - Equipamento de Proteção Individual - EPI's - da portaria nº 3.214 de 08/jun/1970.`,
-  //     `Declaro saber também que terei que devolvê-los no ato de meu desligamento da empresa.`,
-  //   ];
-
-  //   termo.forEach((line) => {
-  //     page.drawText(line, { x: startX, y: startY, size: fontSize, font });
-  //     startY -= 20;
-  //   });
-
-  //   startY -= 10;
-  //   page.drawText("ASSINATURA COLABORADOR:", {
-  //     x: startX,
-  //     y: startY,
-  //     size: fontSize,
-  //     font,
-  //   });
-  //   page.drawLine({
-  //     start: { x: 230, y: startY - 5 },
-  //     end: { x: 650, y: startY - 5 },
-  //     thickness: 1,
-  //   });
-
-  //   startY -= 16;
-  //   page.drawLine({
-  //     start: { x: startX, y: startY },
-  //     end: { x: 780, y: startY },
-  //     thickness: 2,
-  //   });
-
-  //   startY -= 50;
-  //   const colWidths = [100, 100, 250, 120, 180];
-  //   const headers = [
-  //     "Data",
-  //     "Tamanho",
-  //     "Descrição Equipamento",
-  //     "N° do CA",
-  //     "Assinatura",
-  //   ];
-
-  //   let cellX = startX;
-  //   headers.forEach((header, i) => {
-  //     page.drawRectangle({
-  //       x: cellX,
-  //       y: startY,
-  //       width: colWidths[i],
-  //       height: 25,
-  //       borderColor: rgb(0, 0, 0),
-  //       borderWidth: 1,
-  //     });
-  //     page.drawText(header, {
-  //       x: cellX + 10,
-  //       y: startY + 7,
-  //       size: fontSize,
-  //       font,
-  //     });
-  //     cellX += colWidths[i];
-  //   });
-
-  //   const updatedFilePdf = await pdfDoc.save();
-
-  //   if (currentFilePath !== newFilePath) {
-  //     fs.renameSync(currentFilePath, newFilePath);
-  //   }
-
-  //   fs.writeFileSync(newFilePath, updatedFilePdf);
-
-  //   return newFileName;
-  // }
