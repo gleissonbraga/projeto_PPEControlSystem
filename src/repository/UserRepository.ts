@@ -214,5 +214,18 @@ export class UserRepository {
 
         return result.rows[0]
     }
+
+    static async getCpf(attribuites: {cpf: string}) {
+        const {cpf} = attribuites
+
+        const sql = "SELECT * FROM users WHERE cpf = $1"
+        const value = [cpf]
+
+        const result = await db_query_params(sql, value)
+
+        const resultUser = result.rows[0]
+        
+        return resultUser
+    }
     
 }

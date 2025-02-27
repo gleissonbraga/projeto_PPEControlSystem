@@ -145,5 +145,18 @@ export class CompanyRepository {
         }
 
     }
+
+    static async getCodCompany(attribuite: {cnpj: string | null}){
+        const {cnpj} = attribuite
+
+        const sql = "SELECT * FROM company WHERE cnpj = $1"
+        const value = [cnpj]
+
+        const result = await db_query_params(sql, value)
+
+        const resultUser = result.rows[0]
+        
+        return resultUser
+    }
         
 }

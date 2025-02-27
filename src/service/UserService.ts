@@ -150,4 +150,6 @@ export class UserService {
             return userActivated
         }
     }
+
+
 }
