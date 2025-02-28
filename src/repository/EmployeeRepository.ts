@@ -61,7 +61,7 @@ export class EmployeeRepository{
 
 
     static async showEmployeeAll(){
-        const sql = "SELECT * FROM employee_test"
+        const sql = "SELECT * FROM employee"
         const employees = await db_query(sql)
 
         return employees.rows
@@ -182,7 +182,7 @@ export class EmployeeRepository{
             const namePdf = await PdfEmployee.createPdfEmployee({nameLowerCase, job_positionLowerCase, start_date, date_layoff, social_name, cnpj, cpf})
 
 
-            const sqlCreate = "INSERT INTO employee_test (name, job_position, cpf, date_of_birth, start_date, date_layoff, status_employee, cod_company, content_pdf) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *"
+            const sqlCreate = "INSERT INTO employee (name, job_position, cpf, date_of_birth, start_date, date_layoff, status_employee, cod_company, content_pdf) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *"
             const valuesCreate = [nameLowerCase, job_positionLowerCase, cpf, date_of_birth, start_date, date_layoff_parametro, default_status_employee, cod_company, namePdf]
 
 
@@ -202,7 +202,7 @@ export class EmployeeRepository{
         const nameLowerCase = name.toLocaleLowerCase()
         const job_positionLowerCase = job_position.toLocaleLowerCase()
 
-        const sqlCheckCpf = "SELECT cpf FROM employee_test WHERE cpf = $1 and cod_employee != $2"
+        const sqlCheckCpf = "SELECT cpf FROM employee WHERE cpf = $1 and cod_employee != $2"
         const valueCheckCpf = [cpf, id]
         const resultCheckCpf = await db_query_params(sqlCheckCpf, valueCheckCpf)
 
@@ -211,7 +211,7 @@ export class EmployeeRepository{
             return null
         } else {
 
-            const sqlUpdateCpf = "UPDATE employee_test SET cpf = $1 WHERE cod_employee = $2 RETURNING *"
+            const sqlUpdateCpf = "UPDATE employee SET cpf = $1 WHERE cod_employee = $2 RETURNING *"
             const valueCpf = [cpf, id]
             const cpfUpdated = await db_query_params(sqlUpdateCpf, valueCpf)
 
@@ -222,13 +222,13 @@ export class EmployeeRepository{
             const cnpj = company.cnpj
 
             
-            const sqlUpdateEmployee = "UPDATE employee_test SET name = $1, job_position = $2, date_of_birth = $3, start_date = $4, date_layoff = $5, status_employee = $6, cod_company = $7 WHERE cod_employee = $8 RETURNING *"
+            const sqlUpdateEmployee = "UPDATE employee SET name = $1, job_position = $2, date_of_birth = $3, start_date = $4, date_layoff = $5, status_employee = $6, cod_company = $7 WHERE cod_employee = $8 RETURNING *"
             const valuesUpdateEmployee = [nameLowerCase, job_positionLowerCase, date_of_birth, start_date, date_layoff, status_employee, cod_company, id]
             const employeeUpdated = await db_query_params(sqlUpdateEmployee, valuesUpdateEmployee)
 
 
 
-            const sqlNamePdfEmployee = "SELECT * FROM employee_test WHERE cod_employee = $1"
+            const sqlNamePdfEmployee = "SELECT * FROM employee WHERE cod_employee = $1"
             const getUser = await db_query_params(sqlNamePdfEmployee, [id])
 
             const user = getUser.rows[0]
@@ -247,7 +247,7 @@ export class EmployeeRepository{
             p.date_delivery, 
             c.cnpj 
             FROM control_epi as p 
-            JOIN employee_test e ON (e.cod_employee = p.cod_employee) 
+            JOIN employee e ON (e.cod_employee = p.cod_employee) 
             JOIN company c ON (c.cod_company = e.cod_company) 
             JOIN product_epi pe ON (pe.cod_epi = p.cod_epi) 
             WHERE e.cod_employee = $1 AND c.cod_company = $2`
@@ -259,7 +259,7 @@ export class EmployeeRepository{
             const updateFilePdf = await PdfEmployee.updatePdfEmployee({content_pdf: user.content_pdf}, {employeeName, employeeJobPosition, employeeStartDate, employeeDateLayoff, social_name,cnpj, employeeCpf}, dataEpis)
             
             const namePdfReal = updateFilePdf != user.content_pdf ? updateFilePdf : user.content_pdf
-            const sqlUpdatePdf = "UPDATE employee_test SET content_pdf = $1 WHERE cod_employee = $2"
+            const sqlUpdatePdf = "UPDATE employee SET content_pdf = $1 WHERE cod_employee = $2"
             const valuesUpdatePdf = [namePdfReal, id]
             const namePdfupdate = await db_query_params(sqlUpdatePdf, valuesUpdatePdf)
 

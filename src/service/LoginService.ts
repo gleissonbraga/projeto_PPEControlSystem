@@ -16,10 +16,12 @@ export class LoginService {
         const user = await UserRepository.getCpf({cpf})
         const company = await CompanyRepository.getCodCompany({cnpj})
 
+
         if(cnpj != null) {
-            const checkCnpjIsNumber = /^\d{11}$/
-            if(!checkCnpjIsNumber.test(cnpj)) throw new HttpError(400, "O CNPJ deve conter somente números. ex: (00000000000000)")
+            const checkCnpjIsNumber = /^\d{14}$/
+            if(!checkCnpjIsNumber.test(cnpj)) throw new HttpError(400, "CNPJ incorreto. ex: (00000000000000)")
         }
+
 
         const checkCpfIsNumber = /^\d{11}$/
         if(!checkCpfIsNumber.test(cpf)) throw new HttpError(400, "O CPF deve conter somente números. ex: (00000000000)")
@@ -35,18 +37,21 @@ export class LoginService {
 
         } else if(user.cod_company === null){
 
+
+
             if(!process.env.JWT_KEY) throw new HttpError(404, "JWT_KEY não definida nas variáveis de ambiente")
 
-            const payload = {id: user.cod_user, name: user.username, admin: user.status_admin}
-            
+            const payload = {id: user.cod_user, name: user.username, company: user.cod_company, status_admin: user.status_admin}
+            console.log(payload)
             const token = jwt.sign(payload, process.env.JWT_KEY, { expiresIn: '4h'})
             return {id: 200, token}
 
-        } else if(company.cod_company != user.cod_company) {
+        } else if(user.cod_company !== null && cnpj === null) {
 
             throw new HttpError(404, "CNPJ incorreto")
 
         } else if (company.cod_company === user.cod_company){
+
 
             if(!process.env.JWT_KEY) throw new HttpError(404, "JWT_KEY não definida nas variáveis de ambiente")
 
@@ -62,9 +67,10 @@ export class LoginService {
     static async verifyToken(token: string){
         try {
             if(!process.env.JWT_KEY) throw new HttpError(404, "JWT_KEY não definida nas variáveis de ambiente")
+                
+                const payload = jwt.verify(token, process.env.JWT_KEY) as {id: number, name: string, company: number | null, status_admin: number}
 
-                const payload = jwt.verify(token, process.env.JWT_KEY) as {id: number, name: string, company: number, status_admin: number}
-        
+                
                 return payload
         } catch (error) {
             if(error){

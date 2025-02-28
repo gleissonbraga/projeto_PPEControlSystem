@@ -50,7 +50,7 @@ export class ControlEpiRepository{
 
         const result = await db_query_params(sqlControl, valuesControl)
 
-        const sqlNamePdfEmployee = "SELECT * FROM employee_test as e JOIN company c ON (c.cod_company = e.cod_company)  WHERE cod_employee = $1"
+        const sqlNamePdfEmployee = "SELECT * FROM employee as e JOIN company c ON (c.cod_company = e.cod_company)  WHERE cod_employee = $1"
         const getEmployee = await db_query_params(sqlNamePdfEmployee, [cod_employee])
         const employee = getEmployee.rows[0]
 
@@ -71,7 +71,7 @@ export class ControlEpiRepository{
         p.date_delivery, 
         c.cnpj 
         FROM control_epi as p 
-        JOIN employee_test e ON (e.cod_employee = p.cod_employee) 
+        JOIN employee e ON (e.cod_employee = p.cod_employee) 
         JOIN company c ON (c.cod_company = e.cod_company) 
         JOIN product_epi pe ON (pe.cod_epi = p.cod_epi) 
         WHERE e.cod_employee = $1 AND c.cod_company = $2`
@@ -90,7 +90,7 @@ export class ControlEpiRepository{
         const value = [id_epi, id_employee]
         const result = await db_query_params(sql, value)
 
-        const sqlUser = "SELECT * FROM employee_test as e JOIN company c ON (c.cod_company = e.cod_company)  WHERE cod_employee = $1"
+        const sqlUser = "SELECT * FROM employee as e JOIN company c ON (c.cod_company = e.cod_company)  WHERE cod_employee = $1"
         const resultUser = await db_query_params(sqlUser, [id_employee])
         const user = resultUser.rows[0]
 
@@ -110,7 +110,7 @@ export class ControlEpiRepository{
         p.date_delivery, 
         c.cnpj 
         FROM control_epi as p 
-        JOIN employee_test e ON (e.cod_employee = p.cod_employee) 
+        JOIN employee e ON (e.cod_employee = p.cod_employee) 
         JOIN company c ON (c.cod_company = e.cod_company) 
         JOIN product_epi pe ON (pe.cod_epi = p.cod_epi) 
         WHERE e.cod_employee = $1 AND c.cod_company = $2`
@@ -130,7 +130,7 @@ export class ControlEpiRepository{
                 pe.size, 
                 c.cnpj 
             FROM control_epi as p 
-            JOIN employee_test e ON (e.cod_employee = p.cod_employee) 
+            JOIN employee e ON (e.cod_employee = p.cod_employee) 
             JOIN company c ON (c.cod_company = e.cod_company) 
             JOIN product_epi pe ON (pe.cod_epi = pe.cod_epi) 
             WHERE e.cod_employee = $1 AND c.cod_company = $2`
@@ -138,7 +138,7 @@ export class ControlEpiRepository{
 
         const result = await db_query_params(sql, value)
         
-        console.log(result.rows)
+
         return result.rows
 
     }

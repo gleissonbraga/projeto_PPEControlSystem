@@ -20,6 +20,7 @@ export class LoginController{
         try {
             const parsedBody = LoginRequestSchema.parse(req.body)
             const userValidation = await LoginService.login(parsedBody)
+            res.json(userValidation)
         } catch (error) {
             if(error instanceof HttpError){
                 res.status(error.status).json({ message: error.message })

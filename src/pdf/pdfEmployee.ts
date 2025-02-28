@@ -358,8 +358,7 @@ export class PdfEmployee {
           startY = pageHeight - 50
         }
         const dateDeliveryFormat = format(date_delivery, "dd/MM/yyyy")
-        console.log(date_delivery)
-        console.log(dateDeliveryFormat)
+
   
         let colX = startX;
 

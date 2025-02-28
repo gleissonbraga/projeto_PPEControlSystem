@@ -7,5 +7,7 @@ declare namespace Express {
             status_admin: z.number
         };
         userId?: number;
+        userCompany?: number
+        userStatusAdmin?: number
     }
 }
