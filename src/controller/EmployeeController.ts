@@ -10,7 +10,6 @@ const EmployeeRequestSchema = z.object({
     cpf: z.string(),
     date_of_birth: z.string(),
     start_date: z.string(),
-    cod_company: z.number()
 })
 
 const EmployeeUpdateRequestSchema = z.object({
@@ -33,12 +32,13 @@ export class EmployeeController{
         res.json(allEmployees)
     }
 
-    // GET funcionarios/empresa/:id
+    // GET funcionarios/empresa/ativo
     showEmployeeByCompany: Handler = async (req, res) => {
-        const {id} = req.params
+        const codCompany = req.userCompany
+        const cod_company = codCompany == null ? null : codCompany
 
         try {
-            const employee = await EmployeeService.showEmployeeByCompany(+id)
+            const employee = await EmployeeService.showEmployeeByCompany(cod_company)
             res.json(employee)
         } catch (error) {
             if(error instanceof HttpError){
@@ -55,10 +55,11 @@ export class EmployeeController{
 
     // GET funcionarios/empresa/inativos/:id
     showInactivateEmployeeByCompany: Handler = async (req, res) => {
-        const {id} = req.params
+        const codCompany = req.userCompany
+        const cod_company = codCompany == null ? null : codCompany
 
         try {
-            const employee = await EmployeeService.showInativateEmployeeByCompany(+id)
+            const employee = await EmployeeService.showInativateEmployeeByCompany(cod_company)
             res.json(employee)
         } catch (error) {
             if(error instanceof HttpError){
@@ -69,9 +70,11 @@ export class EmployeeController{
 
     // POST funcionarios/cadastrar
     createEmployee: Handler = async (req, res) => {
+        const codCompany = req.userCompany
+        const cod_company = codCompany == null ? null : codCompany
         try {
             const parsedBody = EmployeeRequestSchema.parse(req.body)
-            const employeeCreated = await EmployeeService.createEmployee(parsedBody)
+            const employeeCreated = await EmployeeService.createEmployee(parsedBody, cod_company)
             res.json(employeeCreated)
         } catch (error) {
             if(error instanceof HttpError){

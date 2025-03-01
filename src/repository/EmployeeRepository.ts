@@ -67,7 +67,7 @@ export class EmployeeRepository{
         return employees.rows
     }
     
-    static async showEmployeeByCompany(cod_company: number){
+    static async showEmployeeByCompany(cod_company: number | null){
         const sql = "SELECT e.cod_employee, e.name, e.job_position, e.cpf, e.date_of_birth, e.start_date, e.date_layoff, e.status_employee, c.fantasy_name, c.cnpj FROM employee as e JOIN company c ON (c.cod_company = e.cod_company) WHERE e.status_employee = $1 AND e.cod_company = $2 ORDER BY name"
 
         const trueEmployee = true
@@ -90,7 +90,7 @@ export class EmployeeRepository{
     }
 
 
-    static async showInativateEmployeeByCompany(cod_company: number){
+    static async showInativateEmployeeByCompany(cod_company: number | null){
         const sql = "SELECT e.cod_employee, e.name, e.job_position, e.cpf, e.date_of_birth, e.start_date, e.date_layoff, e.status_employee, c.fantasy_name, c.cnpj FROM employee as e JOIN company c ON (c.cod_company = e.cod_company) WHERE e.status_employee = $1 AND e.cod_company = $2 ORDER BY name"
 
         const falseEmployee = false
@@ -155,8 +155,8 @@ export class EmployeeRepository{
     }
 
 
-    static async createEmployee(attributes: Omit<EmployeeAttribute, "status_employee"| "date_layoff">){
-        const { name, job_position, cpf, date_of_birth, start_date, cod_company } = attributes
+    static async createEmployee(attributes: Omit<EmployeeAttribute, "status_employee"| "date_layoff" | "cod_company">, cod_company: number | null){
+        const { name, job_position, cpf, date_of_birth, start_date } = attributes
         
         const nameLowerCase = name.toLocaleLowerCase()
         const job_positionLowerCase = job_position.toLocaleLowerCase()
@@ -180,6 +180,8 @@ export class EmployeeRepository{
             const date_layoff = ""
 
             const namePdf = await PdfEmployee.createPdfEmployee({nameLowerCase, job_positionLowerCase, start_date, date_layoff, social_name, cnpj, cpf})
+
+            console.log(namePdf)
 
 
             const sqlCreate = "INSERT INTO employee (name, job_position, cpf, date_of_birth, start_date, date_layoff, status_employee, cod_company, content_pdf) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *"
