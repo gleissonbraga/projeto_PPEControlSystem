@@ -20,12 +20,22 @@ export class Product_EpiController{
         res.json(productEpi)
     }
 
+    // GET epis/empresa
+    showProductsByCompany: Handler = async (req, res) => {
+        const codCompany = req.userCompany
+        const cod_company = codCompany == null ? null : codCompany
+        
+        const productEpi = await Product_epiService.showProductsByCompany(cod_company)
+        res.json(productEpi)
+    }
 
     // POST epis/cadastrar
     createProduct_epi: Handler = async (req, res) => {
+        const codCompany = req.userCompany
+        const cod_company = codCompany == null ? null : codCompany
         try {
             const parsedBody =  ProductEpiRequestSchema.parse(req.body)
-            const createdProduct = await Product_epiService.createProduct_epi(parsedBody)
+            const createdProduct = await Product_epiService.createProduct_epi(parsedBody, cod_company)
             res.json(createdProduct)
         } catch (error) {
             if(error instanceof HttpError){
@@ -37,10 +47,12 @@ export class Product_EpiController{
     // PUT epis/atualizar/:id
     updateProduct_epi: Handler = async (req, res) => {
         const { id } = req.params
+        const codCompany = req.userCompany
+        const cod_company = codCompany == null ? null : codCompany
 
         try {
             const parsedBody =  ProductEpiRequestSchema.parse(req.body)
-            const updateProduct = await Product_epiService.updateProduct_epi(+id, parsedBody)
+            const updateProduct = await Product_epiService.updateProduct_epi(+id, cod_company, parsedBody)
             res.json(updateProduct)
         } catch (error) {
             if(error instanceof HttpError){

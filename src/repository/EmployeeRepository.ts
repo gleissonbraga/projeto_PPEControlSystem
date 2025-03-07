@@ -74,8 +74,21 @@ export class EmployeeRepository{
         const values = [trueEmployee, cod_company]
 
         const employeesCompanies = await db_query_params(sql, values)
+        const employees = employeesCompanies.rows
 
-        return employeesCompanies.rows
+        return employees.map((employee) => {
+            return {
+                cod_employee: employee.cod_employee,
+                name: employee.name,
+                job_position: employee.job_position,
+                date_of_birth: employee.date_of_birth,
+                start_date: employee.start_date,
+                date_layoff: employee.date_layoff === null ? "" : employee.date_layoff,
+                status_employee: employee.status_employee === true ? "ativo" : "inativo",
+                name_company: employee.fantasy_name,
+                cnpj_company: employee.cnpj
+            } 
+        })
     }
 
     static async showInactivateEmployeeAll(){

@@ -43,7 +43,7 @@ export class LoginService {
 
             const payload = {id: user.cod_user, name: user.username, company: user.cod_company, status_admin: user.status_admin}
             console.log(payload)
-            const token = jwt.sign(payload, process.env.JWT_KEY, { expiresIn: '4h'})
+            const token = jwt.sign(payload, process.env.JWT_KEY, { expiresIn: '30d'})
             return {id: 200, token}
 
         } else if(user.cod_company !== null && cnpj === null) {

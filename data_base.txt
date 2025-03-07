@@ -132,7 +132,8 @@ PRODUCT_EPI
 
 CREATE TABLE PRODUCT_EPI (
     cod_epi SERIAL PRIMARY KEY,             
-    cod_category_epi INT NOT NULL,          
+    cod_category_epi INT NOT NULL,
+    cod_company INT NOT NULL,          
     name_epi VARCHAR(100) NOT NULL,         
     color VARCHAR(50),                      
     size VARCHAR(50),                     
